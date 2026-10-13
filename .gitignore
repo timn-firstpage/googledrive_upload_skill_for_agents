@@ -6,6 +6,7 @@ venv/
 .env.*
 !.env.example
 env.sh
+env.ps1
 *.json
 *.pem
 *.key

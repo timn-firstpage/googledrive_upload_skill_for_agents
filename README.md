@@ -1,6 +1,6 @@
 # Google Drive Upload Skill for Agents
 
-让 Mac 上的 Codex 使用 **Google Cloud service account**，将已完成的本地报告上传到你指定的 Google Drive 文件夹。它用本地 Python 脚本访问 Drive API，不需要运行 MCP server。
+让 **macOS 和 Windows** 上的 Codex 使用 **Google Cloud service account**，将已完成的本地报告上传到你指定的 Google Drive 文件夹。它用同一份本地 Python 脚本访问 Drive API，不需要运行 MCP server。Skill 会按当前系统选择 Bash/zsh 或 PowerShell 的配置步骤。
 
 Skill 提供两个流程：
 
@@ -11,7 +11,7 @@ Skill 提供两个流程：
 
 ## 使用前提
 
-1. Mac 上有 Codex、本地命令执行能力、Python **3.10+** 和网络连接。
+1. macOS 或 Windows 上有 Codex、Git、本地命令执行能力、Python **3.10+** 和网络连接。
 2. Google Cloud 项目已启用 Google Drive API。
 3. 一个服务账号及其 JSON key 文件。**JSON 文件留在本机仓库外，不能提交 GitHub。**
 4. 一个 **Shared Drive / 共享云端硬盘**中的目标文件夹，直接分享给服务账号，并允许添加内容和所需的子文件夹/文件修改。
@@ -19,6 +19,37 @@ Skill 提供两个流程：
 普通 **My Drive / 我的云端硬盘**中的共享文件夹不适合作为服务账号新文件上传目标：服务账号不能拥有新文件。脚本会检测并停止。[Google 官方说明](https://docs.cloud.google.com/iam/docs/service-account-overview)
 
 为保持隔离，只分享目标文件夹，不默认把账号加为整个共享云端硬盘的 Content Manager，也不授予 Cloud 项目级 Editor/Owner。管理员的分享限制仍然适用。[Drive 权限说明](https://developers.google.com/workspace/drive/api/guides/about-shareddrives)
+
+## 选择你的系统
+
+| 项目 | macOS（Bash/zsh） | Windows（PowerShell） |
+| --- | --- | --- |
+| 逐步引导 | [Mac setup](references/setup-macos.md) | [Windows setup](references/setup-windows.md) |
+| Skill 目录 | `~/.agents/skills/gdrive-upload` | `$HOME\.agents\skills\gdrive-upload` |
+| 私有配置建议位置 | `~/.config/gdrive-upload` | `$env:LOCALAPPDATA\gdrive-upload` |
+| venv Python | `venv/bin/python` | `venv\Scripts\python.exe` |
+| 加载配置 | `source env.sh` | `. '完整路径\env.ps1'` |
+| 调用解释器 | `"$GDRIVE_PYTHON"` | `& $env:GDRIVE_PYTHON` |
+
+同一个账号和 Drive 文件夹 ID 可以在两台机器上复用，每台机器分别配置 JSON 文件路径与 Python 路径。Windows 的 `C:\...` 路径不能直接在 Mac 使用。下面先给 Windows 快速安装，再列出 Mac 的完整示例；Windows 的检测、doctor 和上传命令见 [Windows setup](references/setup-windows.md)。
+
+## 在 Windows 安装
+
+在 PowerShell 中执行，目录已存在时先检查，不要覆盖：
+
+```powershell
+$skillDir = Join-Path $HOME '.agents\skills\gdrive-upload'
+New-Item -ItemType Directory -Force (Split-Path $skillDir) | Out-Null
+git clone https://github.com/timn-firstpage/googledrive_upload_skill_for_agents.git $skillDir
+py -3 --version
+$venvDir = Join-Path $env:LOCALAPPDATA 'gdrive-upload\venv'
+py -3 -m venv $venvDir
+$gdrivePython = Join-Path $venvDir 'Scripts\python.exe'
+& $gdrivePython -m pip install -r (Join-Path $skillDir 'requirements.txt')
+& $gdrivePython (Join-Path $skillDir 'scripts\gdrive_upload.py') detect
+```
+
+需要已安装的 Python 3.10+；没有 `py` launcher 时，用已验证的 Python 可执行文件替换 `py -3`。无需激活 venv。配置示例见 [env.windows.example.ps1](examples/env.windows.example.ps1)，复制到仓库外再填写。PowerShell 中使用 `$env:变量名` 和调用运算符 `&`，不要直接运行本文中的 `export`、`source` 或 `chmod`。
 
 ## 在 Mac 安装
 
@@ -41,13 +72,13 @@ python3 -m venv "$HOME/.local/share/gdrive-upload/venv"
   -r "$HOME/.agents/skills/gdrive-upload/requirements.txt"
 ```
 
-然后在 Mac Codex 中输入：
+安装完成后，在任一系统的 Codex 中输入：
 
 > 使用 `$gdrive-upload` 带我逐步 setup。先检测已有服务账号配置；找到 key 路径后让我确认再读取。如果我已有账号，复用它。只授权我指定的 Shared Drive 文件夹。
 
-完整引导见 [Mac setup](references/setup-macos.md)。这个仓库是 Skill 包，不会自动在 Google Cloud 创建账号或扩大 Drive 权限。
+完整引导见 [Mac setup](references/setup-macos.md) 或 [Windows setup](references/setup-windows.md)。这个仓库是 Skill 包，不会自动在 Google Cloud 创建账号或扩大 Drive 权限。
 
-## 保存本机配置
+## 保存本机配置（以下命令为 Mac 示例）
 
 准备两个位置：Skill 仓库存放通用代码，私有配置目录存放 key 和环境配置。
 
@@ -151,7 +182,8 @@ link: 可打开的 Drive URL
 | 情况 | 处理 |
 | --- | --- |
 | detect找不到 path | 检查同一执行 shell是否加载本机配置，或向用户询问已有 key路径 |
-| key path不存在 | 确认在当前 Mac 的路径；Windows路径不能直接使用 |
+| key path不存在 | 确认当前机器的路径；Mac 和 Windows 的绝对路径不能互用 |
+| PowerShell 加载 env.ps1 被阻止 | 在同一个命令块直接设置三项 `$env:` 变量再调用 helper，无需修改系统执行策略 |
 | HTTP 403 | 检查 Drive API、根文件夹授权、管理员外部分享限制及 key有效性 |
 | My Drive目标被拒绝 | 改用用户指定的 Shared Drive文件夹；不会改用主账号登录 |
 | 同名文件停止 | 检查已上传文件；要替换时明确指定文件 ID和授权 |
@@ -167,7 +199,9 @@ python3 -m unittest discover -s tests -v
 python3 scripts/gdrive_upload.py --help
 ```
 
-测试使用离线 Drive替身，验证路径确认、目录范围、dry-run不写入、子文件夹、同名保护和文件替换；不使用真实 key或写入生产 Drive。Mac上的实际 Google连接和一次真实上传需要由用户在 setup完成后验证。
+Windows 可用 `py -3 -m unittest discover -s tests -v`，或用自己的 venv Python 执行同样参数。[跨平台 CI 示例](examples/cross-platform-tests.yml) 可在获得 GitHub workflow 权限后保存到 `.github/workflows/tests.yml`，在 macOS 和 Windows、Python 3.10/3.12 上运行同一套离线测试。目前示例尚未启用。
+
+测试使用离线 Drive 替身，验证路径确认、目录范围、dry-run 不写入、子文件夹、同名保护和文件替换；不使用真实 key 或写入生产 Drive。每台机器上的实际 Google 连接和一次真实上传需要由用户在 setup 完成后验证。
 
 更新已安装仓库：
 
@@ -179,8 +213,10 @@ git -C "$HOME/.agents/skills/gdrive-upload" pull --ff-only
 
 - [SKILL.md](SKILL.md)：agent的 setup/upload流程。
 - [setup-macos.md](references/setup-macos.md)：逐步配置和权限说明。
+- [setup-windows.md](references/setup-windows.md)：Windows PowerShell 安装、配置与上传。
 - [gdrive_upload.py](scripts/gdrive_upload.py)：本地检测、检查和上传工具。
 - [外部 prompt](examples/onsite-upload-prompt.md)：与 onsite checking skills串联。
 - [.env.example](.env.example)：只含示例路径，实际配置留在仓库外。
+- [env.windows.example.ps1](examples/env.windows.example.ps1)：Windows 路径配置示例。
 
 这是自定义 Skill，不是 Google或 OpenAI官方 Drive连接器。没有把任何服务账号 key或客户实际配置打包进仓库。

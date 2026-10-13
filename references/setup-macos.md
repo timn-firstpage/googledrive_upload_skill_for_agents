@@ -1,5 +1,7 @@
 # Mac setup：先检测、再逐步引导
 
+Windows 使用 [PowerShell setup](setup-windows.md)，不要在 Windows 直接执行本页的 Bash 或 chmod 命令。
+
 向用户逐步提供当前所需操作，不一次要求用户交出所有账号信息。以下是引导顺序；已完成的步骤检查后复用。
 
 ## 1. 检测已有配置并确认凭据路径

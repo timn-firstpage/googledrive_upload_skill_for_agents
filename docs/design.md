@@ -1,6 +1,6 @@
 # Design
 
-A portable Mac Codex Skill guides setup of isolated service-account Drive access and uploads onsite audit outputs using a local Python helper. The user approved this design and requested existing-account detection, key-path confirmation, a GitHub repository and README.
+A portable macOS/Windows Codex Skill guides setup of isolated service-account Drive access and uploads onsite audit outputs using a local Python helper. The user approved this design and requested existing-account detection, key-path confirmation, a GitHub repository and README. OS-specific guides select Bash/zsh or PowerShell syntax, private config locations and venv interpreter paths; the Drive API logic is shared.
 
 Setup discovers only configured credential paths without reading contents or contacting Google. The user confirms the selected path before authentication; two different paths require a choice. Existing projects/accounts/keys are reused. New setup guides Drive API enablement, service account creation, JSON download, private local storage, folder-scoped sharing and Python venv installation.
 
