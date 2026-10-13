@@ -21,6 +21,8 @@ Configure `GDRIVE_ROOT_FOLDER_ID` from the user's exact folder ID/URL. The helpe
 
 Setup includes credentials, venv, folder access and the read-only doctor check. A real test upload is optional and needs authorization for that test file. Do not claim a live upload was tested solely from doctor or offline tests.
 
+For this repository's onsite workflow, read [the onsite target guide](references/onsite-target.md): the requested Shared Drive is `Onsite_audit_ai_run_records`. Require its confirmed root URL/ID before configuring it. This example does not override another user's explicit destination or hardcode a target into the helper.
+
 ## Upload outputs
 
 Require exact local file paths and a confirmed final version plus upload authorization. The default destination is the configured root; an exact descendant ID or relative subfolder path can refine it. No fuzzy client-name lookup. Upload explicitly listed artifacts one at a time; do not scan and publish a whole project.

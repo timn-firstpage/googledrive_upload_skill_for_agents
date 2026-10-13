@@ -22,6 +22,8 @@ Skill 提供两个流程：
 
 ## 选择你的系统
 
+当前 onsite 使用目标：**`Onsite_audit_ai_run_records`**（新建的 Shared Drive）。配置步骤见 [onsite 目标配置](references/onsite-target.md)。实际上传仍使用你确认的 Drive ID，不按此名称搜索或猜测。
+
 | 项目 | macOS（Bash/zsh） | Windows（PowerShell） |
 | --- | --- | --- |
 | 逐步引导 | [Mac setup](references/setup-macos.md) | [Windows setup](references/setup-windows.md) |

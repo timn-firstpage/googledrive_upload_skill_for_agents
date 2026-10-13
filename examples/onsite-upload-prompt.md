@@ -2,6 +2,8 @@
 
 配置完成后，在 Mac Codex 中使用：
 
+Mac 和 Windows 均可使用以下 prompt。当前 onsite 目标是 Shared Drive `Onsite_audit_ai_run_records`；先按 [目标配置](../references/onsite-target.md) 确认并设置准确根 ID。未确认 ID 时不要仅按盘名上传。
+
 > 使用现有 onsite checking skills 对我指定的网站完成审计，将最终报告保存在本地。列出本次明确生成的最终输出文件。然后使用 `$gdrive-upload` 将这些文件上传到已配置根文件夹下的 `<site>/<run-date>`。本次请求授权上传这些最终输出及创建这个明确的子文件夹路径；如果同名文件存在就停止，不能覆盖。首次使用先检测已有 service account 配置，并让我确认 JSON key 的路径。每个文件先做 dry-run 校验，成功后返回 Drive 链接和文件 ID。不上传 crawl cache、凭据或项目内其他文件。
 
 把 `<site>/<run-date>` 换成明确的文件夹路径。这个 prompt 编排两类 skills；gdrive-upload 本身只处理 setup 与上传。
