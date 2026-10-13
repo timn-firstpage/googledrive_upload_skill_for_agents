@@ -95,7 +95,7 @@ chmod 700 "$HOME/.config/gdrive-upload"
 
 ```bash
 export GDRIVE_SA_KEY_FILE="$HOME/.config/gdrive-upload/service-account.json"
-export GDRIVE_ROOT_FOLDER_ID="YOUR_APPROVED_ROOT_FOLDER_ID"
+export GDRIVE_ROOT_FOLDER_ID="0AOx3b-buiVeqUk9PVA"
 export GDRIVE_PYTHON="$HOME/.local/share/gdrive-upload/venv/bin/python"
 ```
 
