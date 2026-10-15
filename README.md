@@ -1,8 +1,6 @@
 # Service Account Setup + Google Drive Upload
 
-Skill 调用名称：`$service-account-setup-gdrive-upload`。
-
-已有旧版安装：将原来的 Skill 目录 `gdrive-upload` 改名为 `service-account-setup-gdrive-upload` 后再使用本文的新路径；目标目录已存在时先检查，不覆盖。私有配置目录、JSON key、venv 和 `GDRIVE_*` 环境变量保持原样，无需重新创建服务账号。
+Skill 名称：`service-account-setup-gdrive-upload`。在 Codex 中用 `$service-account-setup-gdrive-upload` 调用。
 
 让 **macOS 和 Windows** 上的 Codex 使用 **Google Cloud service account**，将已完成的本地报告上传到你指定的 Google Drive 文件夹。它用同一份本地 Python 脚本访问 Drive API，不需要运行 MCP server。Skill 会按当前系统选择 Bash/zsh 或 PowerShell 的配置步骤。
 
@@ -13,20 +11,35 @@ Skill 提供两个流程：
 
 它可以和现有 onsite checking skills 配合：审计由原来的 skills完成，外部 prompt再调用这个 Skill 上传输出。示例见 [onsite 衔接 prompt](examples/onsite-upload-prompt.md)。
 
+## 快速开始
+
+1. 按下方的 Mac 或 Windows 命令安装 Skill 和 Python 依赖。
+2. 在 Codex 中输入：
+
+   > 使用 `$service-account-setup-gdrive-upload` 带我设置。先检测已有 service account；如果找到 JSON key 路径，先让我确认再读取。复用现有账号，将输出目标设置为 `Onsite_audit_ai_run_records`，根 ID 为 `0AOx3b-buiVeqUk9PVA`。先运行只读 doctor 检查，暂不上传文件。
+
+3. 检查通过后，指定最终文件并明确授权上传，例如：
+
+   > 使用 `$service-account-setup-gdrive-upload`。`<最终报告的本机绝对路径>` 已确认是最终版，授权上传到已配置目标下的 `example.com/2026-10-15`，允许创建这个子路径。先预览，再使用预览校验值上传；同名文件存在则停止。
+
+JSON 文件是凭据；`GDRIVE_SA_KEY_FILE` 是它的路径；`GDRIVE_ROOT_FOLDER_ID` 是目标位置；`GDRIVE_PYTHON` 是本机 venv 的解释器路径。这些环境变量不是三把不同的 key。
+
 ## 使用前提
 
 1. macOS 或 Windows 上有 Codex、Git、本地命令执行能力、Python **3.10+** 和网络连接。
 2. Google Cloud 项目已启用 Google Drive API。
 3. 一个服务账号及其 JSON key 文件。**JSON 文件留在本机仓库外，不能提交 GitHub。**
-4. 一个 **Shared Drive / 共享云端硬盘**中的目标文件夹，直接分享给服务账号，并允许添加内容和所需的子文件夹/文件修改。
+4. 一个 **Shared Drive / 共享云端硬盘**或其中的目标文件夹，已向服务账号授权添加内容和所需的子文件夹/文件修改。
 
 普通 **My Drive / 我的云端硬盘**中的共享文件夹不适合作为服务账号新文件上传目标：服务账号不能拥有新文件。脚本会检测并停止。[Google 官方说明](https://docs.cloud.google.com/iam/docs/service-account-overview)
 
-为保持隔离，只分享目标文件夹，不默认把账号加为整个共享云端硬盘的 Content Manager，也不授予 Cloud 项目级 Editor/Owner。管理员的分享限制仍然适用。[Drive 权限说明](https://developers.google.com/workspace/drive/api/guides/about-shareddrives)
+当前使用的是专门存放审计输出的 `Onsite_audit_ai_run_records`，可将服务账号设为该盘的 **Contributor（贡献者）**，满足 API 上传、创建子文件夹及编辑文件。若使用包含其他资料的共享云端硬盘，则只授权需要的目标文件夹。无需为此授予 Google Cloud 项目级 Editor/Owner。管理员的分享限制仍然适用。[Drive 权限说明](https://developers.google.com/workspace/drive/api/guides/about-shareddrives)
 
 ## 选择你的系统
 
 当前 onsite 使用目标：**`Onsite_audit_ai_run_records`**（新建的 Shared Drive）。配置步骤见 [onsite 目标配置](references/onsite-target.md)。实际上传仍使用你确认的 Drive ID，不按此名称搜索或猜测。
+
+已确认的根 ID：`0AOx3b-buiVeqUk9PVA`。示例已填写此值；用于其他项目时替换为自己的准确 ID。已有账号成员添加由用户完成，真实连接与上传仍需在当前机器验证。
 
 | 项目 | macOS（Bash/zsh） | Windows（PowerShell） |
 | --- | --- | --- |
@@ -209,11 +222,25 @@ Windows 可用 `py -3 -m unittest discover -s tests -v`，或用自己的 venv P
 
 测试使用离线 Drive 替身，验证路径确认、目录范围、dry-run 不写入、子文件夹、同名保护和文件替换；不使用真实 key 或写入生产 Drive。每台机器上的实际 Google 连接和一次真实上传需要由用户在 setup 完成后验证。
 
-更新已安装仓库：
+## 更新与旧名称迁移
+
+旧版 Skill 名称可能是 `gdrive-upload` 或 `service-account-setup-upload`。先在原来的安装目录运行 `git pull --ff-only`，再将该 Skill 目录改名为 `service-account-setup-gdrive-upload`。新目录已存在时先检查，不覆盖，不保留两个副本让 Codex 重复发现。
+
+私有配置目录和 venv 仍可保留 `gdrive-upload` 这个原路径；它们不是 Skill 的调用名称。JSON key、服务账号、`GDRIVE_*` 环境变量和 Drive 目标都无需因改名而重建。仓库 URL 也保持不变。
+
+已使用新目录名称的 Mac 安装：
 
 ```bash
 git -C "$HOME/.agents/skills/service-account-setup-gdrive-upload" pull --ff-only
 ```
+
+Windows PowerShell：
+
+```powershell
+git -C (Join-Path $HOME '.agents\skills\service-account-setup-gdrive-upload') pull --ff-only
+```
+
+更新后在新对话中调用 `$service-account-setup-gdrive-upload`；如果 Codex 仍显示旧名称，重启后再检查。
 
 ## 文件
 
@@ -225,4 +252,4 @@ git -C "$HOME/.agents/skills/service-account-setup-gdrive-upload" pull --ff-only
 - [.env.example](.env.example)：只含示例路径，实际配置留在仓库外。
 - [env.windows.example.ps1](examples/env.windows.example.ps1)：Windows 路径配置示例。
 
-这是自定义 Skill，不是 Google或 OpenAI官方 Drive连接器。没有把任何服务账号 key或客户实际配置打包进仓库。
+这是自定义 Skill，不是 Google 或 OpenAI 官方 Drive 连接器。仓库示例包含本项目已确认的目标名称与 ID；私钥、真实本机凭据路径和私有环境配置保存在仓库外。
