@@ -1,9 +1,9 @@
 ---
-name: gdrive-upload
+name: service-account-setup-upload
 description: Set up isolated Google Drive access through an existing or new service account, then upload confirmed local outputs into a configured folder and its subfolders. Use for Drive upload requests or service-account upload setup; onsite audits remain separate workflows.
 ---
 
-# Google Drive upload
+# Service Account Setup + Upload
 
 Use the bundled local Python helper on macOS or Windows; no MCP server is required. This skill has setup and upload modes. Run commands relative to this skill's absolute directory, not the current audit project. Choose commands for the actual runtime OS and shell; do not send Bash syntax to PowerShell.
 
