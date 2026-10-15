@@ -5,7 +5,7 @@
 ## 1. 安装 Skill 与 Python 环境
 
 ```powershell
-$skillDir = Join-Path $HOME '.agents\skills\service-account-setup-upload'
+$skillDir = Join-Path $HOME '.agents\skills\service-account-setup-gdrive-upload'
 New-Item -ItemType Directory -Force (Split-Path $skillDir) | Out-Null
 git clone https://github.com/timn-firstpage/googledrive_upload_skill_for_agents.git $skillDir
 py -3 --version
@@ -45,7 +45,7 @@ GUI 启动的 Codex 不一定继承另外一个 PowerShell 窗口的环境变量
 
 ```powershell
 . (Join-Path $env:LOCALAPPDATA 'gdrive-upload\env.ps1')
-$skillDir = Join-Path $HOME '.agents\skills\service-account-setup-upload'
+$skillDir = Join-Path $HOME '.agents\skills\service-account-setup-gdrive-upload'
 $helper = Join-Path $skillDir 'scripts\gdrive_upload.py'
 & $env:GDRIVE_PYTHON $helper detect
 # 用户确认 key 路径与根文件夹 ID 后：
@@ -60,7 +60,7 @@ Doctor 只读，不证明账号没有其他 Drive 授权。让用户或管理员
 
 ```powershell
 . (Join-Path $env:LOCALAPPDATA 'gdrive-upload\env.ps1')
-$helper = Join-Path $HOME '.agents\skills\service-account-setup-upload\scripts\gdrive_upload.py'
+$helper = Join-Path $HOME '.agents\skills\service-account-setup-gdrive-upload\scripts\gdrive_upload.py'
 & $env:GDRIVE_PYTHON $helper upload 'C:\Reports\final-report.xlsx' `
   --confirmed-key-file $env:GDRIVE_SA_KEY_FILE `
   --subfolder 'example.com/2026-10-13' --create-subfolders --dry-run
@@ -70,7 +70,7 @@ $helper = Join-Path $HOME '.agents\skills\service-account-setup-upload\scripts\g
 
 ```powershell
 . (Join-Path $env:LOCALAPPDATA 'gdrive-upload\env.ps1')
-$helper = Join-Path $HOME '.agents\skills\service-account-setup-upload\scripts\gdrive_upload.py'
+$helper = Join-Path $HOME '.agents\skills\service-account-setup-gdrive-upload\scripts\gdrive_upload.py'
 & $env:GDRIVE_PYTHON $helper upload 'C:\Reports\final-report.xlsx' `
   --confirmed-key-file $env:GDRIVE_SA_KEY_FILE `
   --subfolder 'example.com/2026-10-13' --create-subfolders `

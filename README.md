@@ -1,8 +1,8 @@
-# Service Account Setup + Upload
+# Service Account Setup + Google Drive Upload
 
-Skill 调用名称：`$service-account-setup-upload`。
+Skill 调用名称：`$service-account-setup-gdrive-upload`。
 
-已有旧版安装：将原来的 Skill 目录 `gdrive-upload` 改名为 `service-account-setup-upload` 后再使用本文的新路径；目标目录已存在时先检查，不覆盖。私有配置目录、JSON key、venv 和 `GDRIVE_*` 环境变量保持原样，无需重新创建服务账号。
+已有旧版安装：将原来的 Skill 目录 `gdrive-upload` 改名为 `service-account-setup-gdrive-upload` 后再使用本文的新路径；目标目录已存在时先检查，不覆盖。私有配置目录、JSON key、venv 和 `GDRIVE_*` 环境变量保持原样，无需重新创建服务账号。
 
 让 **macOS 和 Windows** 上的 Codex 使用 **Google Cloud service account**，将已完成的本地报告上传到你指定的 Google Drive 文件夹。它用同一份本地 Python 脚本访问 Drive API，不需要运行 MCP server。Skill 会按当前系统选择 Bash/zsh 或 PowerShell 的配置步骤。
 
@@ -31,7 +31,7 @@ Skill 提供两个流程：
 | 项目 | macOS（Bash/zsh） | Windows（PowerShell） |
 | --- | --- | --- |
 | 逐步引导 | [Mac setup](references/setup-macos.md) | [Windows setup](references/setup-windows.md) |
-| Skill 目录 | `~/.agents/skills/service-account-setup-upload` | `$HOME\.agents\skills\service-account-setup-upload` |
+| Skill 目录 | `~/.agents/skills/service-account-setup-gdrive-upload` | `$HOME\.agents\skills\service-account-setup-gdrive-upload` |
 | 私有配置建议位置 | `~/.config/gdrive-upload` | `$env:LOCALAPPDATA\gdrive-upload` |
 | venv Python | `venv/bin/python` | `venv\Scripts\python.exe` |
 | 加载配置 | `source env.sh` | `. '完整路径\env.ps1'` |
@@ -44,7 +44,7 @@ Skill 提供两个流程：
 在 PowerShell 中执行，目录已存在时先检查，不要覆盖：
 
 ```powershell
-$skillDir = Join-Path $HOME '.agents\skills\service-account-setup-upload'
+$skillDir = Join-Path $HOME '.agents\skills\service-account-setup-gdrive-upload'
 New-Item -ItemType Directory -Force (Split-Path $skillDir) | Out-Null
 git clone https://github.com/timn-firstpage/googledrive_upload_skill_for_agents.git $skillDir
 py -3 --version
@@ -64,10 +64,10 @@ $gdrivePython = Join-Path $venvDir 'Scripts\python.exe'
 ```bash
 mkdir -p "$HOME/.agents/skills"
 git clone https://github.com/timn-firstpage/googledrive_upload_skill_for_agents.git \
-  "$HOME/.agents/skills/service-account-setup-upload"
+  "$HOME/.agents/skills/service-account-setup-gdrive-upload"
 ```
 
-Codex 支持在 `~/.agents/skills` 发现本地 Skill。如果没有显示，重启 Codex，在新对话中输入 `$service-account-setup-upload`。[Codex Skill 安装位置](https://learn.chatgpt.com/docs/build-skills)
+Codex 支持在 `~/.agents/skills` 发现本地 Skill。如果没有显示，重启 Codex，在新对话中输入 `$service-account-setup-gdrive-upload`。[Codex Skill 安装位置](https://learn.chatgpt.com/docs/build-skills)
 
 创建仓库外的 Python 环境并安装依赖：
 
@@ -75,12 +75,12 @@ Codex 支持在 `~/.agents/skills` 发现本地 Skill。如果没有显示，重
 python3 --version
 python3 -m venv "$HOME/.local/share/gdrive-upload/venv"
 "$HOME/.local/share/gdrive-upload/venv/bin/python" -m pip install \
-  -r "$HOME/.agents/skills/service-account-setup-upload/requirements.txt"
+  -r "$HOME/.agents/skills/service-account-setup-gdrive-upload/requirements.txt"
 ```
 
 安装完成后，在任一系统的 Codex 中输入：
 
-> 使用 `$service-account-setup-upload` 带我逐步 setup。先检测已有服务账号配置；找到 key 路径后让我确认再读取。如果我已有账号，复用它。只授权我指定的 Shared Drive 文件夹。
+> 使用 `$service-account-setup-gdrive-upload` 带我逐步 setup。先检测已有服务账号配置；找到 key 路径后让我确认再读取。如果我已有账号，复用它。只授权我指定的 Shared Drive 文件夹。
 
 完整引导见 [Mac setup](references/setup-macos.md) 或 [Windows setup](references/setup-windows.md)。这个仓库是 Skill 包，不会自动在 Google Cloud 创建账号或扩大 Drive 权限。
 
@@ -111,7 +111,7 @@ Mac GUI启动的 Codex 不一定继承 Terminal export。让 agent在调用脚�
 
 ```bash
 source "$HOME/.config/gdrive-upload/env.sh"
-"$GDRIVE_PYTHON" "$HOME/.agents/skills/service-account-setup-upload/scripts/gdrive_upload.py" detect
+"$GDRIVE_PYTHON" "$HOME/.agents/skills/service-account-setup-gdrive-upload/scripts/gdrive_upload.py" detect
 ```
 
 `detect` 只检查环境变量指向的路径是否存在，不读取 JSON key，不调用 Google API。它不是“账号已经连通”的证明。Skill 会询问你是否使用检测到的 path；多个不同 path会让你选择。新会话先确认，当前会话已确认同一路径则复用。
@@ -120,7 +120,7 @@ source "$HOME/.config/gdrive-upload/env.sh"
 
 ```bash
 source "$HOME/.config/gdrive-upload/env.sh"
-"$GDRIVE_PYTHON" "$HOME/.agents/skills/service-account-setup-upload/scripts/gdrive_upload.py" \
+"$GDRIVE_PYTHON" "$HOME/.agents/skills/service-account-setup-gdrive-upload/scripts/gdrive_upload.py" \
   doctor --confirmed-key-file "$GDRIVE_SA_KEY_FILE"
 ```
 
@@ -134,7 +134,7 @@ Doctor 只读检查，返回服务账号邮箱、实际目标文件夹和写入�
 
 ```bash
 source "$HOME/.config/gdrive-upload/env.sh"
-"$GDRIVE_PYTHON" "$HOME/.agents/skills/service-account-setup-upload/scripts/gdrive_upload.py" \
+"$GDRIVE_PYTHON" "$HOME/.agents/skills/service-account-setup-gdrive-upload/scripts/gdrive_upload.py" \
   upload "/absolute/path/final-report.xlsx" \
   --confirmed-key-file "$GDRIVE_SA_KEY_FILE" \
   --subfolder "example.com/2026-10-13" --create-subfolders --dry-run
@@ -144,7 +144,7 @@ Dry-run 会显示文件路径、名称、大小、`md5` 校验值、实际目标
 
 ```bash
 source "$HOME/.config/gdrive-upload/env.sh"
-"$GDRIVE_PYTHON" "$HOME/.agents/skills/service-account-setup-upload/scripts/gdrive_upload.py" \
+"$GDRIVE_PYTHON" "$HOME/.agents/skills/service-account-setup-gdrive-upload/scripts/gdrive_upload.py" \
   upload "/absolute/path/final-report.xlsx" \
   --confirmed-key-file "$GDRIVE_SA_KEY_FILE" \
   --subfolder "example.com/2026-10-13" --create-subfolders \
@@ -212,7 +212,7 @@ Windows 可用 `py -3 -m unittest discover -s tests -v`，或用自己的 venv P
 更新已安装仓库：
 
 ```bash
-git -C "$HOME/.agents/skills/service-account-setup-upload" pull --ff-only
+git -C "$HOME/.agents/skills/service-account-setup-gdrive-upload" pull --ff-only
 ```
 
 ## 文件
